@@ -1,8 +1,8 @@
 [phases.setup]
-apt_pkgs = ["ffmpeg", "libsm6", "libxext6"]
+nixPkgs = ["libGL"]
 
 [phases.install]
 cmds = ["pip install -r requirements.txt"]
 
 [phases.start]
-cmds = ["python app.py"]
+cmd = "gunicorn app:app --bind 0.0.0.0:$PORT"
