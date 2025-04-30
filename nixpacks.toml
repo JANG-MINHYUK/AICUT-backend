@@ -1,15 +1,15 @@
 [phases.setup]
 nixPkgs = [
-  "python311Full",         # pip, setuptools, wheel 포함
-  "libGL",
+  "python311Full",
   "mesa",
+  "libGL",
   "pkg-config"
 ]
 
 [phases.install]
 cmds = [
-  "pip install --break-system-packages -r requirements.txt"
+  "/nix/store/*python3*/bin/pip3 install --break-system-packages -r requirements.txt"
 ]
 
 [phases.start]
-cmd = "gunicorn app:app --bind 0.0.0.0:$PORT"
+cmd = "/nix/store/*python3*/bin/gunicorn app:app --bind 0.0.0.0:$PORT"
