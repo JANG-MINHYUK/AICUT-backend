@@ -100,5 +100,9 @@ def process_video():
 def api_status():
     return jsonify({"status": "Server is running", "timestamp": time.time()})
 
+@app.route("/", methods=["GET"])
+def health_check():
+    return "✅ AICUT Backend is running!", 200
+
 if __name__ == '__main__':
     app.run(debug=True)
