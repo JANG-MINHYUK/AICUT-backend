@@ -17,4 +17,5 @@ cmds = [
 ]
 
 [phases.start]
-cmd = "LD_LIBRARY_PATH=/nix/var/nix/profiles/default/lib:$LD_LIBRARY_PATH $HOME/.local/bin/gunicorn app:app --bind 0.0.0.0:$PORT"
+cmd = 'bash -c "LD_LIBRARY_PATH=/nix/var/nix/profiles/default/lib:$LD_LIBRARY_PATH $HOME/.local/bin/gunicorn app:app --bind 0.0.0.0:$PORT"'
+
