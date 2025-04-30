@@ -1,6 +1,6 @@
 [phases.setup]
 nixPkgs = [
-  "python311Full",  # pip 포함된 전체 패키지
+  "python311Full",     # 반드시 이걸 써야 pip 포함됨!
   "mesa",
   "libGL",
   "pkg-config"
