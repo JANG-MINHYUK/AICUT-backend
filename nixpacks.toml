@@ -3,8 +3,7 @@ nixPkgs = [
   "python311Full",  # Python 3.11 포함
   "mesa",
   "libGL",
-  "pkg-config",
-  "pip"
+  "pkg-config"
 ]
 
 [phases.install]
