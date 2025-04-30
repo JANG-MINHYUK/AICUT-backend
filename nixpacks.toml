@@ -1,13 +1,19 @@
 [phases.setup]
 nixPkgs = [
-  "mesa",                # libGL.so.1 제공
+  "mesa",                  # OpenGL 관련
+  "mesa.drivers",          # 실제 GPU 드라이버 포함
+  "libGL",                 # 일부 환경에서 필요한 직접적인 패키지
   "python311",
   "python311Packages.pip",
+  "python311Packages.setuptools",
+  "python311Packages.wheel",
   "python311Packages.gunicorn"
 ]
 
 [phases.install]
-cmds = ["pip install --break-system-packages -r requirements.txt"]
+cmds = [
+  "pip install --break-system-packages -r requirements.txt"
+]
 
 [phases.start]
 cmd = "gunicorn app:app --bind 0.0.0.0:$PORT"
