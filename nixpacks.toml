@@ -17,5 +17,4 @@ cmds = [
 ]
 
 [phases.start]
-cmd = 'bash -c "LD_LIBRARY_PATH=/nix/var/nix/profiles/default/lib:$LD_LIBRARY_PATH $HOME/.local/bin/gunicorn app:app --bind 0.0.0.0:$PORT"'
-
+cmd = "LD_LIBRARY_PATH=/nix/store:$(nix eval --raw nixpkgs.lib.makeLibraryPath [ libGL mesa libglvnd ]):$LD_LIBRARY_PATH $HOME/.local/bin/gunicorn app:app --bind 0.0.0.0:$PORT"
