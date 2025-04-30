@@ -1,6 +1,6 @@
 [phases.setup]
 nixPkgs = [
-  "python311Full",
+  "python311Full",  # pip 포함된 전체 패키지
   "mesa",
   "libGL",
   "pkg-config"
@@ -8,8 +8,8 @@ nixPkgs = [
 
 [phases.install]
 cmds = [
-  "/nix/store/*python3*/bin/pip3 install --break-system-packages -r requirements.txt"
+  "python3 -m pip install --break-system-packages -r requirements.txt"
 ]
 
 [phases.start]
-cmd = "/nix/store/*python3*/bin/gunicorn app:app --bind 0.0.0.0:$PORT"
+cmd = "gunicorn app:app --bind 0.0.0.0:$PORT"
