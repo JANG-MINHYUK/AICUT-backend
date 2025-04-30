@@ -1,15 +1,17 @@
 [phases.setup]
 nixPkgs = [
-  "python311Full",   # pip 포함되어 있지 않으므로 아래에서 따로 설치
+  "python311Full",           # Python + pip 포함된 풀 패키지
   "mesa",
   "libGL",
-  "pkg-config"
+  "pkg-config",
+  "python311Packages.pip",   # ✅ pip 명시적 추가
+  "python311Packages.setuptools",
+  "python311Packages.wheel"
 ]
 
 [phases.install]
 cmds = [
-  "python3 -m ensurepip --upgrade",  # ✅ pip 설치
-  "python3 -m pip install --break-system-packages -r requirements.txt"
+  "pip install --break-system-packages -r requirements.txt"
 ]
 
 [phases.start]
