@@ -1,18 +1,15 @@
 [phases.setup]
 nixPkgs = [
-  "python311Full",           # Python + pip 포함된 풀 패키지
+  "python311Full",
   "mesa",
   "libGL",
-  "pkg-config",
-  "python311Packages.pip",   # ✅ pip 명시적 추가
-  "python311Packages.setuptools",
-  "python311Packages.wheel"
+  "pkg-config"
 ]
 
 [phases.install]
 cmds = [
-  "pip install --break-system-packages -r requirements.txt"
+  "python3 -m pip install --break-system-packages -r requirements.txt"
 ]
 
 [phases.start]
-cmd = "gunicorn app:app --bind 0.0.0.0:$PORT"
+cmd = "PATH=$PATH:/root/.local/bin gunicorn app:app --bind 0.0.0.0:$PORT"
