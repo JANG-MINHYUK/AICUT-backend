@@ -11,8 +11,7 @@ nixPkgs = [
 
 [phases.install]
 cmds = [
-  "pip install --break-system-packages -r requirements.txt",
-  "echo 'export PATH=$HOME/.local/bin:$PATH' >> $HOME/.profile"
+  "pip install --break-system-packages --user -r requirements.txt"
 ]
 
 [phases.start]
