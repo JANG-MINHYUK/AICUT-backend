@@ -11,8 +11,9 @@ nixPkgs = [
 
 [phases.install]
 cmds = [
-  "pip install --break-system-packages -r requirements.txt"
+  "pip install --break-system-packages -r requirements.txt",
+  "echo 'export PATH=/opt/venv/bin:$PATH' >> $HOME/.profile"
 ]
 
 [phases.start]
-cmd = "gunicorn app:app --bind 0.0.0.0:$PORT"
+cmd = "/opt/venv/bin/gunicorn app:app --bind 0.0.0.0:$PORT"
