@@ -1,6 +1,6 @@
 [phases.setup]
 nixPkgs = [
-  "python311Full",
+  "python311Full",         # pip, setuptools, wheel 포함
   "libGL",
   "mesa",
   "pkg-config"
