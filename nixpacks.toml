@@ -1,8 +1,15 @@
 [phases.setup]
-nixPkgs = ["libGL", "mesa", "pkg-config"]
+nixPkgs = [
+  "python311Full",
+  "libGL",
+  "mesa",
+  "pkg-config"
+]
 
 [phases.install]
-cmds = ["pip install --break-system-packages -r requirements.txt"]
+cmds = [
+  "pip install --break-system-packages -r requirements.txt"
+]
 
 [phases.start]
 cmd = "gunicorn app:app --bind 0.0.0.0:$PORT"
