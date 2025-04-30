@@ -6,6 +6,7 @@ nixPkgs = [
   "python311Packages.wheel",
   "mesa",
   "libGL",
+  "libGLU", 
   "pkg-config"
 ]
 
