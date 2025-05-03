@@ -21,9 +21,7 @@ BASE_URL = os.getenv("BASE_URL", "https://aicut-backend-clean-production.up.rail
 ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'mkv'}
 
 app = Flask(__name__)
-
-# CORS 설정
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
 # 앱 config에 경로 지정
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
