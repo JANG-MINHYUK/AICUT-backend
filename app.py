@@ -12,6 +12,10 @@ AUDIO_FOLDER = os.path.join(UPLOAD_FOLDER, 'audio')
 PROCESSED_FOLDER = os.path.join(UPLOAD_FOLDER, 'processed')
 SUBTITLES_FOLDER = os.path.join(UPLOAD_FOLDER, 'subtitles')
 
+BASE_URL = os.getenv("BASE_URL", "https://aicut-backend-clean-production.up.railway.app")
+
+ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'mkv'}
+
 app = Flask(__name__)
 
 @app.route("/")
@@ -69,8 +73,8 @@ def upload_file():
 
             return jsonify({
                 'message': '파일 처리 완료',
-                'videoUrl': f'http://localhost:5000/processed/{processed_filename}',
-                'subtitlesUrl': f'http://localhost:5000/subtitles/{subtitles_filename}',
+                'videoUrl': f'{BASE_URL}/processed/{processed_filename}',
+                'subtitlesUrl': f'{BASE_URL}/subtitles/{subtitles_filename}',
                 'fileName': os.path.splitext(processed_filename)[0]
             })
 
@@ -96,8 +100,8 @@ def process_video():
     processed_video_path = video_path  # Placeholder for actual processing logic
 
     return jsonify({
-        'original_url': f'http://localhost:5000/uploads/{os.path.basename(video_path)}',
-        'processed_url': f'http://localhost:5000/processed/{os.path.basename(processed_video_path)}'
+        'original_url': f'{BASE_URL}/uploads/{os.path.basename(video_path)}',
+        'processed_url': f'{BASE_URL}/processed/{os.path.basename(processed_video_path)}'
     })
 
 @app.route('/api/status', methods=['GET'])
