@@ -3,6 +3,7 @@ from flask_cors import CORS
 import os
 import time
 from werkzeug.utils import secure_filename
+import logging
 
 from utils.whisper_transcriber import transcribe_audio
 from utils.background_remover import BackgroundRemover
@@ -39,6 +40,10 @@ os.makedirs(SUBTITLES_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# 로깅 설정
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 @app.route("/")
 def home():
     return "✅ AICUT Backend is running!", 200
@@ -49,17 +54,17 @@ def api_status():
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
-    print("✅ [upload_file] 요청 도착")
+    logger.info("✅ [upload_file] 요청 도착")
 
     if 'file' not in request.files:
-        print("❌ [upload_file] file 필드 없음")
+        logger.error("❌ [upload_file] file 필드 없음")
         return jsonify({'error': '파일이 요청에 없습니다.'}), 400
 
     file = request.files['file']
-    print(f"📁 [upload_file] 받은 파일명: {file.filename}")
+    logger.info(f"📁 받은 파일: {file.filename}")
 
     if file.filename == '':
-        print("❌ [upload_file] 파일명 비어 있음")
+        logger.error("❌ [upload_file] 파일명 비어 있음")
         return jsonify({'error': '파일이 선택되지 않았습니다.'}), 400
 
     if file and allowed_file(file.filename):
@@ -70,23 +75,23 @@ def upload_file():
 
         save_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{unique_filename}{os.path.splitext(original_filename)[1]}")
         file.save(save_path)
-        print(f"✅ [upload_file] 저장 완료: {save_path}")
+        logger.info(f"✅ 저장 위치: {save_path}")
 
         try:
             processed_video = save_path
 
             # 자막 생성
-            print("🗣 [upload_file] 자막 생성 시작")
+            logger.info("🗣 자막 생성 시작")
             subtitles_path = transcribe_audio(processed_video)
-            print(f"🗣 [upload_file] 자막 생성 완료: {subtitles_path}")
+            logger.info(f"🗣 자막 생성 완료: {subtitles_path}")
 
             # 배경 제거
             remove_bg = request.form.get('remove_background') == 'true'
             if remove_bg:
-                print("🎬 [upload_file] 배경 제거 시작")
+                logger.info("🎬 배경 제거 시작")
                 remover = BackgroundRemover()
                 processed_video = remover.remove_background(processed_video)
-                print(f"🎬 [upload_file] 배경 제거 완료: {processed_video}")
+                logger.info(f"🎬 배경 제거 완료: {processed_video}")
 
             processed_filename = os.path.basename(processed_video)
             subtitles_filename = os.path.basename(subtitles_path)
@@ -99,10 +104,10 @@ def upload_file():
             })
 
         except Exception as e:
-            print(f"🔥 [upload_file] 처리 중 오류: {e}")
+            logger.error(f"🔥 처리 중 오류: {e}")
             return jsonify({'error': '서버 처리 중 오류 발생'}), 500
 
-    print("❌ [upload_file] 허용되지 않는 형식")
+    logger.error("❌ [upload_file] 허용되지 않는 형식")
     return jsonify({'error': '허용되지 않는 파일 형식입니다.'}), 400
 
 @app.route('/process', methods=['POST'])
@@ -113,15 +118,22 @@ def process_video():
     video = request.files['video']
     mode = request.form.get('mode', 'remove')
 
-    video_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(video.filename))
-    video.save(video_path)
+    filename = secure_filename(video.filename)
+    save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    video.save(save_path)
 
-    # 여기에 실제 컷 편집 등 처리 로직 추가 가능
-    processed_video_path = video_path
+    processed_path = save_path
+    if mode == 'remove':
+        logger.info("🎬 배경 제거 시작")
+        remover = BackgroundRemover()
+        processed_path = remover.remove_background(save_path)
+        logger.info(f"🎬 배경 제거 완료: {processed_path}")
+
+    processed_filename = os.path.basename(processed_path)
 
     return jsonify({
-        'original_url': f'{BASE_URL}/uploads/{os.path.basename(video_path)}',
-        'processed_url': f'{BASE_URL}/processed/{os.path.basename(processed_video_path)}'
+        'original_url': f'{BASE_URL}/uploads/{filename}',
+        'processed_url': f'{BASE_URL}/processed/{processed_filename}'
     })
 
 # 파일 서빙 라우트
