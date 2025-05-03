@@ -16,3 +16,8 @@ venv/
 
 # Railway local metadata
 railway.local
+
+# Additional directories
+uploads/
+processed/
+subtitles/

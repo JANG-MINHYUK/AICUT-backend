@@ -14,6 +14,10 @@ SUBTITLES_FOLDER = os.path.join(UPLOAD_FOLDER, 'subtitles')
 
 app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return "Hello, AICUT!"
+
 # 설정은 app 객체 생성 후에 진행해야 합니다
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['AUDIO_FOLDER'] = AUDIO_FOLDER
