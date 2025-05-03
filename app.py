@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import time
@@ -111,6 +111,18 @@ def api_status():
 @app.route("/", methods=["GET"])
 def health_check():
     return "✅ AICUT Backend is running!", 200
+
+@app.route('/processed/<filename>')
+def get_processed_video(filename):
+    return send_from_directory(app.config['PROCESSED_FOLDER'], filename)
+
+@app.route('/subtitles/<filename>')
+def get_subtitle_file(filename):
+    return send_from_directory(app.config['SUBTITLES_FOLDER'], filename)
+
+@app.route('/uploads/<filename>')
+def get_uploaded_video(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(debug=True)
