@@ -57,13 +57,15 @@ class BackgroundRemover:
                     print(f"⚠️ 프레임 {i} 처리 실패, alpha 유효성 검사 실패")
                     continue
 
-                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGRA)
-                frame[:, :, 3] = (alpha * 255).astype(np.uint8)
+                alpha_resized = cv2.resize(alpha, (frame.shape[1], frame.shape[0]))  # (W, H)
+                rgba = np.zeros((frame.shape[0], frame.shape[1], 4), dtype=np.uint8)
+                rgba[..., 0:3] = frame
+                rgba[..., 3] = (alpha_resized * 255).astype(np.uint8)
 
                 frame_path = os.path.join(temp_dir, f'frame_{i:04d}.png')
-                cv2.imwrite(frame_path, frame)
+                cv2.imwrite(frame_path, rgba)
                 processed_frames.append(frame_path)
-                mask_frames.append(alpha)
+                mask_frames.append(alpha_resized)
 
                 print(f"✅ 프레임 {i} 처리 완료")
 
