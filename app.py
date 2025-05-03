@@ -49,44 +49,60 @@ def api_status():
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
+    print("✅ [upload_file] 요청 도착")
+
     if 'file' not in request.files:
+        print("❌ [upload_file] file 필드 없음")
         return jsonify({'error': '파일이 요청에 없습니다.'}), 400
 
     file = request.files['file']
+    print(f"📁 [upload_file] 받은 파일명: {file.filename}")
+
     if file.filename == '':
+        print("❌ [upload_file] 파일명 비어 있음")
         return jsonify({'error': '파일이 선택되지 않았습니다.'}), 400
 
     if file and allowed_file(file.filename):
         timestamp = int(time.time())
         original_filename = secure_filename(file.filename)
         base_name = os.path.splitext(original_filename)[0]
-        extension = os.path.splitext(original_filename)[1]
-        unique_filename = f"{base_name}_{timestamp}{extension}"
-        save_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        unique_filename = f"{base_name}_{timestamp}"
+
+        save_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{unique_filename}{os.path.splitext(original_filename)[1]}")
         file.save(save_path)
+        print(f"✅ [upload_file] 저장 완료: {save_path}")
 
         try:
-            # 자막 생성
-            subtitles_path = transcribe_audio(save_path)
-
-            # 배경 제거 옵션 확인
-            remove_bg = request.form.get('remove_background') == 'true'
             processed_video = save_path
+
+            # 자막 생성
+            print("🗣 [upload_file] 자막 생성 시작")
+            subtitles_path = transcribe_audio(processed_video)
+            print(f"🗣 [upload_file] 자막 생성 완료: {subtitles_path}")
+
+            # 배경 제거
+            remove_bg = request.form.get('remove_background') == 'true'
             if remove_bg:
+                print("🎬 [upload_file] 배경 제거 시작")
                 remover = BackgroundRemover()
-                processed_video = remover.remove_background(save_path)
+                processed_video = remover.remove_background(processed_video)
+                print(f"🎬 [upload_file] 배경 제거 완료: {processed_video}")
+
+            processed_filename = os.path.basename(processed_video)
+            subtitles_filename = os.path.basename(subtitles_path)
 
             return jsonify({
                 'message': '파일 처리 완료',
-                'videoUrl': f'{BASE_URL}/processed/{os.path.basename(processed_video)}',
-                'subtitlesUrl': f'{BASE_URL}/subtitles/{os.path.basename(subtitles_path)}',
-                'fileName': os.path.splitext(os.path.basename(processed_video))[0]
+                'videoUrl': f'{BASE_URL}/processed/{processed_filename}',
+                'subtitlesUrl': f'{BASE_URL}/subtitles/{subtitles_filename}',
+                'fileName': os.path.splitext(processed_filename)[0]
             })
 
         except Exception as e:
-            print(f"Error processing video: {e}")
+            print(f"🔥 [upload_file] 처리 중 오류: {e}")
             return jsonify({'error': '서버 처리 중 오류 발생'}), 500
 
+    print("❌ [upload_file] 허용되지 않는 형식")
     return jsonify({'error': '허용되지 않는 파일 형식입니다.'}), 400
 
 @app.route('/process', methods=['POST'])
