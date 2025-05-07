@@ -13,11 +13,11 @@ nixPkgs = [
 
 [phases.install]
 cmds = [
-  "pip install --break-system-packages --user -r requirements.txt"
+  "pip install --break-system-packages -r requirements.txt"
 ]
 
 [phases.start]
 cmd = '''
 export LD_LIBRARY_PATH=$(nix eval --raw nixpkgs.lib.makeLibraryPath [ libGL mesa libglvnd libGLU ]):$LD_LIBRARY_PATH && \
-$HOME/.local/bin/gunicorn app:app --bind 0.0.0.0:$PORT
+gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120
 '''

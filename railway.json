@@ -1,6 +1,8 @@
 {
   "build": {
-    "builder": "NIXPACKS"
+    "env": {
+      "PYTHON_VERSION": "3.10"
+    }
   },
   "deploy": {
     "startCommand": "gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120"
