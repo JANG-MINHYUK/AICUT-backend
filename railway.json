@@ -3,6 +3,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "$HOME/.local/bin/gunicorn app:app --timeout 90 --bind 0.0.0.0:$PORT"
+    "startCommand": "gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120"
   }
 }
