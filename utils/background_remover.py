@@ -18,7 +18,7 @@ class BackgroundRemover:
         print("📸 프레임 처리 시작")
         try:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = cv2.resize(frame, (512, 512))
+            frame = cv2.resize(frame, (256, 256))  # 원래 512 → 256으로 줄이기
             frame = torch.from_numpy(frame).permute(2, 0, 1).unsqueeze(0).float() / 255.0
 
             if torch.cuda.is_available():
