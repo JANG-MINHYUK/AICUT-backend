@@ -17,25 +17,28 @@ class BackgroundRemover:
     def process_frame(self, frame):
         print("📸 프레임 처리 시작")
         try:
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = cv2.resize(frame, (256, 256))  # 원래 512 → 256으로 줄이기
-            frame = torch.from_numpy(frame).permute(2, 0, 1).unsqueeze(0).float() / 255.0
+            original_h, original_w = frame.shape[:2]
+            original_frame = frame.copy()
+
+            # Resize + normalize
+            rgb_frame = cv2.cvtColor(original_frame, cv2.COLOR_BGR2RGB)
+            resized = cv2.resize(rgb_frame, (256, 256))
+            tensor = torch.from_numpy(resized).permute(2, 0, 1).unsqueeze(0).float() / 255.0
 
             if torch.cuda.is_available():
-                frame = frame.cuda()
+                tensor = tensor.cuda()
 
             with torch.no_grad():
-                result = self.model(frame)
-                alpha = result[0]  # shape: (1, 1, 256, 256)
-                alpha = F.interpolate(alpha, size=(frame.shape[2], frame.shape[3]), mode='bilinear', align_corners=False)
-                alpha = alpha.squeeze().cpu().numpy()  # shape: (256, 256)
-            
-            alpha_resized = cv2.resize(alpha, (frame.shape[1], frame.shape[0]))  # (W, H)
-            rgba = np.zeros((frame.shape[0], frame.shape[1], 4), dtype=np.uint8)
-            rgba[..., 0:3] = frame
-            rgba[..., 3] = (alpha_resized * 255).astype(np.uint8)
+                _, pha, *_ = self.model(tensor)
+                alpha = F.interpolate(pha, size=(original_h, original_w), mode='bilinear', align_corners=False)
+                alpha = alpha.squeeze().cpu().numpy()  # shape: (H, W)
 
-            print(f"✅ alpha 생성 완료, 반환 전 shape: {alpha.shape}")
+            # Create RGBA output
+            rgba = np.zeros((original_h, original_w, 4), dtype=np.uint8)
+            rgba[..., 0:3] = original_frame
+            rgba[..., 3] = (alpha * 255).astype(np.uint8)
+
+            print(f"✅ alpha 생성 완료, 반환 shape: {rgba.shape}")
             return rgba
 
         except Exception as e:
