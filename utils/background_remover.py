@@ -27,9 +27,9 @@ class BackgroundRemover:
             with torch.no_grad():
                 result = self.model(frame)
                 alpha = result[0]
-
-            alpha = F.interpolate(alpha, size=(frame.shape[2], frame.shape[3]), mode='bilinear', align_corners=False)
-            alpha = alpha.squeeze().cpu().numpy()
+                alpha = F.interpolate(alpha, size=(frame.shape[2], frame.shape[3]), mode='bilinear', align_corners=False)
+                alpha = alpha.squeeze().cpu().numpy()  # 최종 shape: (256, 256)
+            
             print(f"✅ alpha 생성 완료, 반환 전 shape: {alpha.shape}")
             return alpha
 
