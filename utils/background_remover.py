@@ -26,12 +26,17 @@ class BackgroundRemover:
 
             with torch.no_grad():
                 result = self.model(frame)
-                alpha = result[0]
+                alpha = result[0]  # shape: (1, 1, 256, 256)
                 alpha = F.interpolate(alpha, size=(frame.shape[2], frame.shape[3]), mode='bilinear', align_corners=False)
-                alpha = alpha.squeeze().cpu().numpy()  # 최종 shape: (256, 256)
+                alpha = alpha.squeeze().cpu().numpy()  # shape: (256, 256)
             
+            alpha_resized = cv2.resize(alpha, (frame.shape[1], frame.shape[0]))  # (W, H)
+            rgba = np.zeros((frame.shape[0], frame.shape[1], 4), dtype=np.uint8)
+            rgba[..., 0:3] = frame
+            rgba[..., 3] = (alpha_resized * 255).astype(np.uint8)
+
             print(f"✅ alpha 생성 완료, 반환 전 shape: {alpha.shape}")
-            return alpha
+            return rgba
 
         except Exception as e:
             print(f"❌ 프레임 처리 중 오류 발생: {e}")
@@ -52,20 +57,14 @@ class BackgroundRemover:
         for i, frame in enumerate(video.iter_frames()):
             print(f"🎞️ 프레임 {i} 수신됨, shape: {frame.shape}")
             try:
-                alpha = self.process_frame(frame)
-                if alpha is None or not isinstance(alpha, np.ndarray):
-                    print(f"⚠️ 프레임 {i} 처리 실패, alpha 유효성 검사 실패")
+                rgba = self.process_frame(frame)
+                if rgba is None or not isinstance(rgba, np.ndarray):
+                    print(f"⚠️ 프레임 {i} 처리 실패, rgba 유효성 검사 실패")
                     continue
-
-                alpha_resized = cv2.resize(alpha, (frame.shape[1], frame.shape[0]))  # (W, H)
-                rgba = np.zeros((frame.shape[0], frame.shape[1], 4), dtype=np.uint8)
-                rgba[..., 0:3] = frame
-                rgba[..., 3] = (alpha_resized * 255).astype(np.uint8)
 
                 frame_path = os.path.join(temp_dir, f'frame_{i:04d}.png')
                 cv2.imwrite(frame_path, rgba)
                 processed_frames.append(frame_path)
-                mask_frames.append(alpha_resized)
 
                 print(f"✅ 프레임 {i} 처리 완료")
 
@@ -75,11 +74,6 @@ class BackgroundRemover:
 
         if not processed_frames:
             raise RuntimeError("⚠️ 처리된 프레임이 없습니다.")
-
-        try:
-            mask = np.stack([m for m in mask_frames if m is not None])
-        except Exception as e:
-            raise ValueError(f"❌ 마스크 스택 오류: {e}")
 
         frame = cv2.imread(processed_frames[0], cv2.IMREAD_UNCHANGED)
         height, width = frame.shape[:2]
