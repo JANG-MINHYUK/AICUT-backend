@@ -39,8 +39,8 @@ def detect_silence(audio_data, threshold=0.01, min_silence_duration=0.5):
 
 def process_video(video_path, mode='remove'):
     """비디오를 처리하여 무음 구간을 제거하거나 분할합니다."""
-    # 비디오 로드
-    video = mp.VideoFileClip(video_path)
+    # 비디오 로드 및 다운스케일
+    video = mp.VideoFileClip(video_path).resize(height=540)  # 1080 → 540으로 다운스케일
     
     # 오디오 추출
     audio = video.audio
@@ -108,4 +108,4 @@ def process_video(video_path, mode='remove'):
     output_path = os.path.splitext(video_path)[0] + '_processed.mp4'
     processed_video.write_videofile(output_path)
     
-    return output_path 
+    return output_path

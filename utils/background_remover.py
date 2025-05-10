@@ -41,7 +41,7 @@ class BackgroundRemover:
 
     def remove_background(self, video_path):
         print("🎞️ 비디오 배경 제거 시작")
-        video = VideoFileClip(video_path)
+        video = VideoFileClip(video_path).resize(height=540)  # 1080 → 540으로 다운스케일
         fps = video.fps
 
         output_path = os.path.splitext(video_path)[0] + '_nobg.mp4'

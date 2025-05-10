@@ -38,7 +38,7 @@ def split_on_silence(input_path, output_dir):
             timestamps.append(('end', end))
 
     # 2. Cut video into segments
-    clip = VideoFileClip(input_path)
+    clip = VideoFileClip(input_path).resize(height=540)  # 1080 → 540으로 다운스케일
     segments = []
     prev = 0.0
     for tag, ts in timestamps:
