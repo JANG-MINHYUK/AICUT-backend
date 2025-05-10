@@ -20,7 +20,7 @@ class BackgroundRemover:
         try:
             original_h, original_w = frame.shape[:2]
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            resized = cv2.resize(frame_rgb, (192, 192))
+            resized = cv2.resize(frame_rgb, (128, 128))  # Updated to 128x128 resolution
 
             tensor = torch.from_numpy(resized).permute(2, 0, 1).unsqueeze(0).float() / 255.0
 
