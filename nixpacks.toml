@@ -8,19 +8,18 @@ nixPkgs = [
   "libGL",
   "libGLU",
   "libglvnd",
-  "pkg-config"
+  "pkg-config",
+  "python311Packages.gunicorn"  # ✅ gunicorn 추가!
 ]
 
 [phases.install]
 cmds = [
-  "pip install --break-system-packages -r requirements.txt",
-  "pip install gunicorn --break-system-packages"
+  "pip install --break-system-packages -r requirements.txt"
 ]
 
 [phases.start]
 cmd = '''
 export PORT=${PORT:-8000} && \
-export PATH=$HOME/.local/bin:$PATH && \
 export LD_LIBRARY_PATH=$(nix eval --raw nixpkgs.lib.makeLibraryPath [ libGL mesa libglvnd libGLU ]):$LD_LIBRARY_PATH && \
 gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120
 '''
