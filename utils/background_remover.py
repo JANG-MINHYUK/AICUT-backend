@@ -20,7 +20,7 @@ class BackgroundRemover:
         try:
             original_h, original_w = frame.shape[:2]
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            resized = cv2.resize(frame_rgb, (128, 128))  # Updated to 128x128 resolution
+            resized = cv2.resize(frame_rgb, (128, 128))  # ✅ 해상도 줄임
 
             tensor = torch.from_numpy(resized).permute(2, 0, 1).unsqueeze(0).float() / 255.0
 
@@ -41,7 +41,7 @@ class BackgroundRemover:
 
     def remove_background(self, video_path):
         print("🎞️ 비디오 배경 제거 시작")
-        video = VideoFileClip(video_path).resize(height=540)  # 1080 → 540으로 다운스케일
+        video = VideoFileClip(video_path).resize(height=540)  # ✅ 프레임 해상도도 줄임
         fps = video.fps
 
         output_path = os.path.splitext(video_path)[0] + '_nobg.mp4'
@@ -61,15 +61,18 @@ class BackgroundRemover:
                 frame_bgra = cv2.cvtColor(frame, cv2.COLOR_RGB2BGRA)
                 frame_bgra[:, :, 3] = (alpha * 255).astype(np.uint8)
 
-                frame_path = os.path.join(temp_dir, f'frame_{i:04d}.png')
-                cv2.imwrite(frame_path, frame_bgra)
+                frame_path = os.path.join(temp_dir, f'frame_{i:04d}.jpg')
+                cv2.imwrite(frame_path, frame_bgra, [int(cv2.IMWRITE_JPEG_QUALITY), 85])  # ✅ JPG 저장, 메모리 절감
                 processed_frames.append(frame_path)
 
-                print(f"✅ 프레임 {i} 처리 완료")
-
-                # 메모리 해제
+                # ✅ 메모리 강제 해제
+                del alpha
+                del frame_bgra
                 torch.cuda.empty_cache()
                 gc.collect()
+
+                if i % 20 == 0:
+                    gc.collect()
 
             except Exception as e:
                 print(f"❗ 프레임 {i} 처리 중 오류 발생: {e}")
@@ -78,7 +81,6 @@ class BackgroundRemover:
         if not processed_frames:
             raise RuntimeError("⚠️ 처리된 프레임이 없습니다.")
 
-        # 영상 저장 (알파 채널 제거, 배경 흰색으로 설정)
         frame_sample = cv2.imread(processed_frames[0], cv2.IMREAD_UNCHANGED)
         height, width = frame_sample.shape[:2]
 
@@ -87,10 +89,9 @@ class BackgroundRemover:
 
         for frame_path in processed_frames:
             frame = cv2.imread(frame_path, cv2.IMREAD_UNCHANGED)
-            # 알파 채널 제거 (흰색 배경으로 합성)
             if frame.shape[2] == 4:
                 alpha_channel = frame[:, :, 3] / 255.0
-                background = np.ones_like(frame[:, :, :3], dtype=np.uint8) * 255  # 흰색 배경
+                background = np.ones_like(frame[:, :, :3], dtype=np.uint8) * 255
                 frame_rgb = (frame[:, :, :3] * alpha_channel[..., None] + background * (1 - alpha_channel[..., None])).astype(np.uint8)
             else:
                 frame_rgb = frame[:, :, :3]
@@ -99,7 +100,6 @@ class BackgroundRemover:
 
         out.release()
 
-        # 임시 파일 정리
         for frame_path in processed_frames:
             os.remove(frame_path)
         os.rmdir(temp_dir)
