@@ -9,7 +9,8 @@ nixPkgs = [
   "libGLU",
   "libglvnd",
   "pkg-config",
-  "python311Packages.gunicorn"
+  "python311Packages.gunicorn",
+  "ffmpeg"  # ✅ ffmpeg 추가!
 ]
 
 [phases.install]
