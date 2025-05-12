@@ -7,7 +7,6 @@ import os
 import gc
 import subprocess
 
-# 글로벌 모델 1번만 로드
 model = torch.hub.load('PeterL1n/RobustVideoMatting', 'mobilenetv3')
 model = model.cuda() if torch.cuda.is_available() else model
 model.eval()
@@ -23,7 +22,6 @@ class BackgroundRemover:
             resized = cv2.resize(frame_rgb, (128, 128))
 
             tensor = torch.from_numpy(resized).permute(2, 0, 1).unsqueeze(0).float() / 255.0
-
             if torch.cuda.is_available():
                 tensor = tensor.cuda()
 
@@ -58,7 +56,6 @@ class BackgroundRemover:
         final_output = os.path.splitext(video_path)[0] + '_final.mp4'
         self.merge_videos(output_files, final_output)
 
-        # Clean up
         for file in output_files + [os.path.join(temp_dir, f) for f in os.listdir(temp_dir)]:
             os.remove(file)
         os.rmdir(temp_dir)
@@ -128,7 +125,6 @@ class BackgroundRemover:
 
         os.remove(list_file)
 
-# 외부 사용용
 remover_instance = BackgroundRemover()
 
 def remove_background(video_path):
