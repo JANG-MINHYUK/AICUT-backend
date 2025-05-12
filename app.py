@@ -19,7 +19,7 @@ BASE_URL = os.getenv("BASE_URL", "https://aicut-backend-clean-production.up.rail
 ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'mkv'}
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": ["*", "http://localhost:5173"]}}, supports_credentials=True)
 
 @app.after_request
 def apply_cors(response):
@@ -52,7 +52,7 @@ def api_status():
     return jsonify({"status": "Server is running", "timestamp": time.time()})
 
 @app.route('/api/upload', methods=['POST', 'OPTIONS'])
-@cross_origin()
+@cross_origin(origins=["*", "http://localhost:5173"])
 def upload_file():
     if request.method == 'OPTIONS':
         return '', 200
@@ -97,7 +97,7 @@ def upload_file():
         return jsonify({'error': '서버 처리 중 오류 발생'}), 500
 
 @app.route('/process', methods=['POST', 'OPTIONS'])
-@cross_origin()
+@cross_origin(origins=["*", "http://localhost:5173"])
 def process_video():
     if request.method == 'OPTIONS':
         return '', 200
