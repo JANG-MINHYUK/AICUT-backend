@@ -21,7 +21,6 @@ cmds = [
 cmd = '''
 export PORT=${PORT:-8000} && \
 export LD_LIBRARY_PATH=$(nix eval --raw nixpkgs.lib.makeLibraryPath [ libGL mesa libglvnd libGLU ]):$LD_LIBRARY_PATH && \
-gunicorn app:app --bind 0.0.0.0:$PORT --timeout 600 --workers 1
-'''
+gunicorn app:app --bind 0.0.0.0:$PORT --timeout 600 --workers 1 
 
 # trigger rebuild
