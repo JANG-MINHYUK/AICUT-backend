@@ -10,7 +10,7 @@ nixPkgs = [
   "libglvnd",
   "pkg-config",
   "python311Packages.gunicorn",
-  "ffmpeg"  # ✅ ffmpeg 추가!
+  "ffmpeg"  # ✅ 병합 작업을 위한 ffmpeg 설치
 ]
 
 [phases.install]
@@ -22,5 +22,5 @@ cmds = [
 cmd = '''
 export PORT=${PORT:-8000} && \
 export LD_LIBRARY_PATH=$(nix eval --raw nixpkgs.lib.makeLibraryPath [ libGL mesa libglvnd libGLU ]):$LD_LIBRARY_PATH && \
-gunicorn app:app --bind 0.0.0.0:$PORT --timeout 1200 --workers 1 --threads 1
+gunicorn app:app --bind 0.0.0.0:$PORT --timeout 600 --workers 1 --threads 1
 '''
