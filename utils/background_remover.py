@@ -38,7 +38,7 @@ class BackgroundRemover:
     def remove_background(self, video_path):
         video = VideoFileClip(video_path)
         total_duration = int(video.duration)
-        chunk_duration = 10  # ✅ Chunk 10초로 변경
+        chunk_duration = 3  # Reduced chunk duration to 3 seconds
         output_files = []
         temp_dir = 'temp_chunks'
         os.makedirs(temp_dir, exist_ok=True)
@@ -63,7 +63,7 @@ class BackgroundRemover:
         return final_output
 
     def process_video_chunk(self, video_path):
-        clip = VideoFileClip(video_path).resize(height=360)  # ✅ 360p 해상도로 낮춤
+        clip = VideoFileClip(video_path).resize(height=240)  # Reduced resolution to 240p
         fps = clip.fps
 
         output_path = video_path.replace(".mp4", "_processed.mp4")

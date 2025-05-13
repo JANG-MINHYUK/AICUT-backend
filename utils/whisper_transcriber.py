@@ -14,7 +14,7 @@ os.makedirs(SUBTITLES_FOLDER, exist_ok=True)
 def extract_audio(video_path):
     """비디오 파일에서 오디오를 추출하고 저장합니다."""
     try:
-        video = VideoFileClip(video_path).resize(height=540)  # 1080 → 540으로 다운스케일
+        video = VideoFileClip(video_path).resize(height=240)  # Reduced resolution to 240p
         base_name = os.path.splitext(os.path.basename(video_path))[0]
         audio_path = os.path.join(AUDIO_FOLDER, f"{base_name}.wav")
         audio_path = audio_path.replace('\\', '/')  # ✅ 경로 통일
