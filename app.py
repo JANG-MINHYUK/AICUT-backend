@@ -97,7 +97,7 @@ def upload_file():
         return jsonify({'error': '서버 처리 중 오류 발생'}), 500
 
 @app.route('/process', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["*", "http://localhost:5173"])
+@cross_origin(origins="*")
 def process_video():
     if request.method == 'OPTIONS':
         return '', 200
