@@ -10,14 +10,14 @@ nixPkgs = [
   "libglvnd",
   "pkg-config",
   "python311Packages.gunicorn",
-  "ffmpeg"  # ✅ 병합 작업을 위한 ffmpeg 설치
+  "ffmpeg"  # ✅ ffmpeg 설치
 ]
-cmds = ["pip install --upgrade pip", "pip install -r requirements.txt"]
-
-[phases.install]
 cmds = [
-  "pip install --break-system-packages -r requirements.txt"
+  # ✅ pip 업그레이드 제거
+  "pip install -r requirements.txt"
 ]
 
-[phases.start]
+# ✅ phases.install 제거 → 중복 제거됨
+
+[start]
 cmd = "gunicorn app:app --timeout 120 --bind 0.0.0.0:8080"
