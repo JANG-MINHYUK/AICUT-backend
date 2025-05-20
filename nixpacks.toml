@@ -10,14 +10,12 @@ nixPkgs = [
   "libglvnd",
   "pkg-config",
   "python311Packages.gunicorn",
-  "ffmpeg"  # ✅ ffmpeg 설치
+  "ffmpeg",          # whisper + moviepy용
+  "rustc"            # whisper 설치에 필요
 ]
 cmds = [
-  # ✅ pip 업그레이드 제거
   "pip install -r requirements.txt"
 ]
-
-# ✅ phases.install 제거 → 중복 제거됨
 
 [start]
 cmd = "gunicorn app:app --timeout 120 --bind 0.0.0.0:8080"
