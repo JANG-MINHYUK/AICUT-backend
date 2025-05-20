@@ -8,7 +8,7 @@ import logging
 from utils.whisper_transcriber import transcribe_audio
 from utils.background_remover import BackgroundRemover
 
-# 폴더 경로 설정
+# 폴더 설정
 UPLOAD_FOLDER = 'uploads'
 AUDIO_FOLDER = os.path.join(UPLOAD_FOLDER, 'audio')
 PROCESSED_FOLDER = os.path.join(UPLOAD_FOLDER, 'processed')
@@ -18,7 +18,7 @@ BASE_URL = os.getenv("BASE_URL", "https://aicut-backend-clean-production.up.rail
 ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'mkv'}
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)  # ✅ 전체 허용
+CORS(app, origins="*", supports_credentials=True)  # ✅ 모든 Origin 허용
 
 @app.after_request
 def apply_cors(response):
@@ -46,9 +46,9 @@ logger = logging.getLogger(__name__)
 def home():
     return "✅ AICUT Backend is running!", 200
 
-@app.route('/process', methods=['POST', 'OPTIONS'])
+@app.route("/process", methods=["POST", "OPTIONS"])
 def process_video():
-    if request.method == 'OPTIONS':
+    if request.method == "OPTIONS":
         return '', 200
 
     if 'video' not in request.files:
@@ -72,15 +72,15 @@ def process_video():
         'processed_url': f'{BASE_URL}/processed/{processed_filename}'
     })
 
-@app.route('/uploads/<filename>')
+@app.route("/uploads/<filename>")
 def serve_uploaded(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-@app.route('/processed/<filename>')
+@app.route("/processed/<filename>")
 def serve_processed(filename):
     return send_from_directory(app.config['PROCESSED_FOLDER'], filename)
 
-@app.route('/subtitles/<filename>')
+@app.route("/subtitles/<filename>")
 def serve_subtitles(filename):
     return send_from_directory(app.config['SUBTITLES_FOLDER'], filename)
 
