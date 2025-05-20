@@ -63,7 +63,7 @@ class BackgroundRemover:
         return final_output
 
     def process_video_chunk(self, video_path):
-        clip = VideoFileClip(video_path).resize(height=240)  # Reduced resolution to 240p
+        clip = VideoFileClip(video_path).resize(height=360)  # ✅ 360p 해상도로 낮춤
         fps = clip.fps
 
         output_path = video_path.replace(".mp4", "_processed.mp4")
