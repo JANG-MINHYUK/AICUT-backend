@@ -1,10 +1,10 @@
-flask==2.3.3
+﻿flask==2.3.3
 flask-cors==4.0.0
 
-# Whisper 안정 버전 (PyPI에서 설치 가능)
+# Whisper ?덉젙 踰꾩쟾 (PyPI?먯꽌 ?ㅼ튂 媛??
 openai-whisper==20231117
 
-# 안정적인 torch 버전
+# ?덉젙?곸씤 torch 踰꾩쟾
 torch==2.2.2
 torchvision==0.17.2
 
