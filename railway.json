@@ -1,9 +1,9 @@
 {
   "build": {
+    "builder": "NIXPACKS",
     "env": {
       "PYTHON_VERSION": "3.10"
-    },
-    "builder": "NIXPACKS"
+    }
   },
   "deploy": {
     "startCommand": "gunicorn app:app --timeout 120 --bind 0.0.0.0:8080"
