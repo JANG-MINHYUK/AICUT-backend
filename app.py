@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 import os
 import time
 from werkzeug.utils import secure_filename
@@ -15,11 +15,10 @@ PROCESSED_FOLDER = os.path.join(UPLOAD_FOLDER, 'processed')
 SUBTITLES_FOLDER = os.path.join(UPLOAD_FOLDER, 'subtitles')
 
 BASE_URL = os.getenv("BASE_URL", "https://aicut-backend-clean-production.up.railway.app")
-
 ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'mkv'}
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["*", "http://localhost:5173"]}}, supports_credentials=True)
+CORS(app, supports_credentials=True)  # ✅ 전체 허용
 
 @app.after_request
 def apply_cors(response):
@@ -47,57 +46,7 @@ logger = logging.getLogger(__name__)
 def home():
     return "✅ AICUT Backend is running!", 200
 
-@app.route('/api/status', methods=['GET'])
-def api_status():
-    return jsonify({"status": "Server is running", "timestamp": time.time()})
-
-@app.route('/api/upload', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["*", "http://localhost:5173"])
-def upload_file():
-    if request.method == 'OPTIONS':
-        return '', 200
-
-    logger.info("✅ [upload_file] 요청 도착")
-
-    if 'file' not in request.files:
-        return jsonify({'error': '파일이 요청에 없습니다.'}), 400
-
-    file = request.files['file']
-    if file.filename == '' or not allowed_file(file.filename):
-        return jsonify({'error': '허용되지 않는 파일 형식입니다.'}), 400
-
-    timestamp = int(time.time())
-    original_filename = secure_filename(file.filename)
-    base_name = os.path.splitext(original_filename)[0]
-    unique_filename = f"{base_name}_{timestamp}"
-    save_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{unique_filename}{os.path.splitext(original_filename)[1]}")
-    file.save(save_path)
-
-    try:
-        processed_video = save_path
-        subtitles_path = transcribe_audio(processed_video)
-
-        remove_bg = request.form.get('remove_background') == 'true'
-        if remove_bg:
-            remover = BackgroundRemover()
-            processed_video = remover.remove_background(processed_video)
-
-        processed_filename = os.path.basename(processed_video)
-        subtitles_filename = os.path.basename(subtitles_path)
-
-        return jsonify({
-            'message': '파일 처리 완료',
-            'videoUrl': f'{BASE_URL}/processed/{processed_filename}',
-            'subtitlesUrl': f'{BASE_URL}/subtitles/{subtitles_filename}',
-            'fileName': os.path.splitext(processed_filename)[0]
-        })
-
-    except Exception as e:
-        logger.error(f"🔥 처리 중 오류: {e}")
-        return jsonify({'error': '서버 처리 중 오류 발생'}), 500
-
 @app.route('/process', methods=['POST', 'OPTIONS'])
-@cross_origin(origins="*")
 def process_video():
     if request.method == 'OPTIONS':
         return '', 200
