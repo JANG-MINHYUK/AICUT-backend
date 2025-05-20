@@ -1,12 +1,19 @@
 flask==2.3.3
 flask-cors==4.0.0
-git+https://github.com/openai/whisper.git
-torch==2.7.0
-torchvision==0.22.0
+
+# Whisper 안정 버전 (PyPI에서 설치 가능)
+openai-whisper==20231117
+
+# 안정적인 torch 버전
+torch==2.2.2
+torchvision==0.17.2
+
 numpy<2.0
+scipy==1.13.0
+
 moviepy==1.0.3
 ffmpeg-python==0.2.0
+
 python-dotenv==1.0.0
 gunicorn==21.2.0
 opencv-python-headless==4.8.0.74
-scipy>=1.15.0
