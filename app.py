@@ -18,7 +18,7 @@ BASE_URL = os.getenv("BASE_URL", "https://aicut-backend-clean-production.up.rail
 ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'mkv'}
 
 app = Flask(__name__)
-CORS(app, origins="*", supports_credentials=True)  # ✅ 모든 Origin 허용
+CORS(app, origins=["http://localhost:5173"])  # ✅ 특정 Origin 허용
 
 @app.after_request
 def apply_cors(response):
