@@ -12,6 +12,7 @@ nixPkgs = [
   "python311Packages.gunicorn",
   "ffmpeg"  # ✅ 병합 작업을 위한 ffmpeg 설치
 ]
+cmds = ["pip install --upgrade pip", "pip install -r requirements.txt"]
 
 [phases.install]
 cmds = [
@@ -19,8 +20,4 @@ cmds = [
 ]
 
 [phases.start]
-cmd = '''
-export PORT=${PORT:-8000} && \
-export LD_LIBRARY_PATH=$(nix eval --raw nixpkgs.lib.makeLibraryPath [ libGL mesa libglvnd libGLU ]):$LD_LIBRARY_PATH && \
-gunicorn app:app --bind 0.0.0.0:$PORT --timeout 600 --workers 1 --threads 1
-'''
+cmd = "gunicorn app:app --timeout 120 --bind 0.0.0.0:8080"
