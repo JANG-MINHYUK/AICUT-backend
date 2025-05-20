@@ -18,29 +18,25 @@ BASE_URL = os.getenv("BASE_URL", "https://aicut-backend-clean-production.up.rail
 ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'mkv'}
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"])  # ✅ 특정 Origin 허용
+CORS(app, origins=["http://localhost:5173"], supports_credentials=True)  # ✅ CORS 설정 (React용)
 
-@app.after_request
-def apply_cors(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
-    response.headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS"
-    return response
-
+# 경로 설정
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['AUDIO_FOLDER'] = AUDIO_FOLDER
 app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
 app.config['SUBTITLES_FOLDER'] = SUBTITLES_FOLDER
 
+# 폴더 생성
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(PROCESSED_FOLDER, exist_ok=True)
 os.makedirs(SUBTITLES_FOLDER, exist_ok=True)
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
+# 로깅
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route("/")
 def home():
@@ -83,6 +79,3 @@ def serve_processed(filename):
 @app.route("/subtitles/<filename>")
 def serve_subtitles(filename):
     return send_from_directory(app.config['SUBTITLES_FOLDER'], filename)
-
-if __name__ == '__main__':
-    app.run(debug=True)
